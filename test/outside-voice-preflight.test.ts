@@ -114,7 +114,7 @@ describe('own-harness review fallback instructions', () => {
       test(`${host.name}: ${name} fallback names only the mode its preflight emits`, () => {
         const ctx: TemplateContext = { host: host.name, skillName: 'review', tmplPath: 'review/SKILL.md.tmpl', paths: HOST_PATHS[host.name] };
         const text = render(ctx);
-        const mode = host.name === 'codex' ? 'under_current_harness' : 'under_codex';
+        const mode = name === 'plan' || host.name === 'codex' ? 'under_current_harness' : 'under_codex';
         const preflight = text.match(/```bash\n([\s\S]*?)\n```/)![1];
         expect(preflight).toContain(mode);
         expect([...new Set(text.match(/under_codex|under_current_harness/g))]).toEqual([mode]);
@@ -145,7 +145,7 @@ function fixture() {
   if (git.status !== 0) throw new Error(git.stderr);
   const capture = path.join(dir, 'capture.json');
   const fake = path.join(dir, 'fake-claude.ts');
-  fs.writeFileSync(fake, `const prompt=await Bun.stdin.text(); await Bun.write(process.env.FIXTURE_CAPTURE!,JSON.stringify({prompt,args:process.argv.slice(2)})); console.log(JSON.stringify({result:'Recommendation: ship because the isolated fixture completed its review.'}));`);
+  fs.writeFileSync(fake, `const prompt=await Bun.stdin.text(); await Bun.write(process.env.FIXTURE_CAPTURE!,JSON.stringify({prompt,args:process.argv.slice(2)})); console.log(JSON.stringify({result:'No issues found.\\nRecommendation: ship because the isolated fixture completed its review.'}));`);
   const env = { ...process.env, HOME: home, CODEX_HOME: '', GSTACK_HOME: path.join(home, '.gstack'),
     GSTACK_ROOT: '', GSTACK_BIN: '', GSTACK_ACTIVE_HOST: 'codex', CODEX_THREAD_ID: 'fixture', CODEX_SANDBOX: '', CLAUDECODE: '',
     GSTACK_CLAUDE_BIN: process.execPath, GSTACK_CLAUDE_BIN_ARGS: JSON.stringify([fake]), FIXTURE_CAPTURE: capture };
